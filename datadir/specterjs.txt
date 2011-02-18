@@ -1,0 +1,48 @@
+phantomjsをwebkitgtk+で書いてみた。
+meta-tags: phantomjs, javascript
+ 
+最近phantomjsなんて物が出てきて結構便利そうなのでいろいろと遊んでます。<br /> 
+<blockquote class="quote"> 
+  <a href="http://d.hatena.ne.jp/karasuyamatengu/20110126/1296066287">PhantomJS： 「最小限なheadlessのWebKitベースのJavaScriptツール」 - karasuyamatenguの日記</a><br /> 
+  <p>headless=スクリーンがない=コマンドと考えればいい。要はブラウザから画面と取り除いてJavaScriptによるスクリプティングを可能にしたコマンドツール。逆に言うとDOM+JavaScript+Networkingをコマンドにしたもの。...</p> 
+  <cite>http://d.hatena.ne.jp/karasuyamatengu/20110126/1296066287</cite> 
+</blockquote> 
+ 
+ 
+<blockquote class="quote"> 
+  <a href="http://code.google.com/p/phantomjs/"> phantomjs -  Project Hosting on Google Code</a><br /> 
+  <p>PhantomJS is a minimalistic, headless, WebKit-based, JavaScript-driven tool. It has native support f...</p> 
+  <cite>http://code.google.com/p/phantomjs/</cite> 
+</blockquote> 
+ 
+ただちょっと改造したいとか、それだけの為にQt入れたくないよーとか、staticビルドすんのに4時間もかかるのかよ！とかお嘆きの方もいらっしゃると思ったので...<br /> 
+<br /> 
+<!-- http://twitter.com/tokuhirom/status/32684392308543488 --> <style type='text/css'>.bbpBox32684392308543490 {background:url(http://a2.twimg.com/a/1296081712/images/themes/theme14/bg.gif) #1f1314;padding:20px;} p.bbpTweet{background:#fff;padding:10px 12px 10px 12px;margin:0;min-height:48px;color:#000;font-size:18px !important;line-height:22px;-moz-border-radius:5px;-webkit-border-radius:5px} p.bbpTweet span.metadata{display:block;width:100%;clear:both;margin-top:8px;padding-top:12px;height:40px;border-top:1px solid #fff;border-top:1px solid #e6e6e6} p.bbpTweet span.metadata span.author{line-height:19px} p.bbpTweet span.metadata span.author img{float:left;margin:0 7px 0 0px;width:38px;height:38px} p.bbpTweet a:hover{text-decoration:underline}p.bbpTweet span.timestamp{font-size:12px;display:block}</style> <div class='bbpBox32684392308543490'><p class='bbpTweet'>phantomjs を webkitgtk+ でうごかしたらいいんじゃね、とおもってやってたけど、コンパイルに必要なモジュールおおすぎてあきらめた<span class='timestamp'><a title='Wed Feb 02 06:19:01 +0000 2011' href='http://twitter.com/tokuhirom/status/32684392308543488'>less than a minute ago</a> via <a href="http://www.echofon.com/" rel="nofollow">Echofon</a></span><span class='metadata'><span class='author'><a href='http://twitter.com/tokuhirom'><img src='http://a1.twimg.com/profile_images/1128049023/hoge_normal.gif' /></a><strong><a href='http://twitter.com/tokuhirom'>徳永 広夢</a></strong><br/>tokuhirom</span></span></p></div> <!-- end of tweet --> 
+<br /> 
+<br /> 
+QtWebKitでなく、webkitgtk+で実装してみました。<br /> 
+ 
+<blockquote class="quote"> 
+  <a href="https://github.com/mattn/specterjs">mattn/specterjs - GitHub</a><br /> 
+  <p>SpecterJS is a minimalistic, headless, WebKit-based, JavaScript-driven tool.</p> 
+  <cite>https://github.com/mattn/specterjs</cite> 
+</blockquote> 
+ 
+ほとんどphantomjs互換です。phantomjsのphantomは幽霊って意味だったので、妖怪という意味のspecterを使いspecterjsと名付けました。<br /> 
+ただまだ制限があって、renderで扱えるのはpdfのみです。png出力にはまだ対応出来ていません。これはいずれやります。おそらくcairoとGtkPrintContext使えばいけるかと思います。<br /> 
+次にrenderで使用する際のviewportSizeが正しく機能していません。<br /> 
+それ以外は動くのでphantomjsについているサンプルの殆どが動きます。<br /> 
+ちなみに<br /> 
+ 
+<blockquote class="code"> 
+<span class="Statement">if</span>&nbsp;(specter.state.length ===&nbsp;<span class="Constant">0</span>)&nbsp;{<br /> 
+&nbsp;&nbsp;&nbsp;&nbsp;specter.state =&nbsp;<span class="Constant">'mcdonalds'</span>;<br /> 
+&nbsp;&nbsp;&nbsp;&nbsp;specter.open(<span class="Constant">'<a href="http://www.mcdonalds.co.jp/menu/regular/index.html">http://www.mcdonalds.co.jp/menu/regular/index.html</a>'</span>);<br /> 
+}&nbsp;<span class="Statement">else</span>&nbsp;{<br /> 
+&nbsp;&nbsp;&nbsp;&nbsp;[].forEach.call(document.querySelectorAll(<span class="Constant">'ul.food-set&gt;li img'</span>),<br /> 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="Identifier">function</span>(n)&nbsp;{ console.log(n.getAttribute(<span class="Constant">'alt'</span>)); });<br /> 
+&nbsp;&nbsp;&nbsp;&nbsp;specter.exit();<br /> 
+}<br /> 
+</blockquote> 
+で、マクドナルドのメニュー一覧を出すことも出来ちゃいます！<br /> 
+よろしかったら遊んで下さい。<br /> 

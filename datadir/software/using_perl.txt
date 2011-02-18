@@ -1,0 +1,15 @@
+このご時世にperlを選ぶ理由
+meta-tags: perl
+
+このご時世にperlを選ぶ理由ねー。
+ 
+<blockquote class="quote"> 
+  <a href="http://www.mwsoft.jp/column/program_top10.html">プログラミング言語人気TOP10の簡易解説</a><br /> 
+  <p>用途的にPythonやRubyと被るので、今あえてPerlを取る理由というのが個人的には思い浮かばない。生粋のPerl使いならきっと流暢な解答を用意してくれると思う。</p> 
+  <cite>http://www.mwsoft.jp/column/program_top10.html</cite> 
+</blockquote> 
+僕が思うに、perlは至らなすぎてるんだと思う。素の状態だとほんとに至らない感がある。言語の完成度の目標値が他の言語と違ってる。つまりperlがここを完成形と値付けている時点で他の言語と比較対象でなくなっている気がするんですよ。でもperlはこの状態から他の言語と同じレベルまで何かを引き上げて肩を並べられる所が凄い。それってつまりはCPANモジュールなんですよね。逆に言えばCPANモジュールが無いとおそろしく膨大なコードを書かないといけないし、そんなコードだれもメンテしたくないんだけどperlはそれがうまくドッキング出来る様にperl monger達がちゃんと教育されている。一見簡単そうな事を疎結合なCPANモジュールでつなぎ合わせる、そんな教育が出来ている。perl monger同士も良い刺激のやりとりがあるし、つまりは上手いこと糊を貼る為のノリシロが出来上がってるんだろね。<br /> 
+そんでもって皆が思ってる程馴れ合ってないと思うよ。<br /> 
+(まぁ僕は一度もYAPC::AsiaとかShibuya.pmに参加したこと無いんだけどね)<br /> 
+<br /> 
+これが<a href="http://blog.livedoor.jp/dankogai/archives/51615486.html" class="external" target="_blank">文化</a>って奴なんかもしれんなー。<br /> 
