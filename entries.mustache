@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+	<head> 
+		<meta charset="utf-8" /> 
+		<title>{{#config}}{{title}}{{/config}}</title> 
+		<link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection" /> 
+		<link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print" /> 
+		<!--[if IE]><link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection" /><![endif]--> 
+		<!-- Import fancy-type plugin. --> 
+		<link rel="stylesheet" href="/css/blueprint/plugins/fancy-type/screen.css" type="text/css" media="screen, projection" /> 
+	</head> 
+	<body> 
+		<div class="container"> 
+			<div id="header" class="span-24 last"> 
+				<h1>{{#config}}{{title}}{{/config}}</h1> 
+			</div> 
+			<hr /> 
+			<div id="subheader" class="span-24 last"> 
+				<h3 class="alt">{{#config}}{{description}}{{/config}}</h3> 
+			</div> 
+
+			<hr /> 
+			<div class="span-17 colborder" id="content"> 
+{{#entries}}
+				<div class="span-17 colborder">
+					<h3 class="loud"><a href="{{Id}}">{{Title}}</a></h3> 
+					<div class="span-17 last"> 
+						<span class="prepend-12">{{#Tags}} {{Name}}{{/Tags}}</span> 
+						<div> 
+{{{Body}}}
+						</div>      
+						<div class="prepend-12 last">{{{Created}}}</div>
+					</div> 
+				</div> 
+{{/entries}}
+{{^entries}}
+<h2>Not Found</h2>
+{{/entries}}
+			</div>
+
+			<div class="span-6 last" id="sidebar"> 
+				<div id="recent-entries"> 
+					<h3 class="caps">Recent Entries</h3> 
+					<div class="box"> 
+						...
+					</div> 
+				</div> 
+
+				<div id="recent-comments"> 
+					<h3 class="caps">Recent Comments</h3> 
+					<div class="box"> 
+						...
+					</div> 
+				</div> 
+			</div> 
+
+			<hr /> 
+			<div id="footer"> 
+				<div class="span-5 colborder"> 
+					<ul> 
+{{#config}}
+{{#links}}
+<li><a class="quiet" href="{{href}}">{{name}}</a></li>
+{{/links}}
+{{/config}}
+					</ul> 
+				</div> 
+
+				<div class="prepend-top push-3 span-8 last"> 
+					<span class="quiet">{{#config}}{{{copyright}}}{{/config}}</span> | 
+					<a href="#" class="quiet">Privacy Policy</a> | 
+					<a href="#" class="quiet">Security Policy</a> 
+				</div> 
+			</div> 
+		</div> 
+	</body> 
+</html>

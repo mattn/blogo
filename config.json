@@ -1,0 +1,14 @@
+{
+	"host": ":9999",
+	"title": "Never Say GoodBye",
+	"description": "I don't wanna live my life like you",
+	"copyright": "Copyright &copy; 2011",
+	"datadir": "datadir",
+	"staticdir": "static",
+	"author": "mattn",
+	"useSummary": "mattn",
+	"links": [
+		{"name": "Big Sky", "href": "http://mattn.kaoriya.net/"},
+		{"name": "twitter", "href": "http://twitter.com/mattn_jp"}
+	]
+}

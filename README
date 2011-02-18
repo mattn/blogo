@@ -1,0 +1,30 @@
+blogo : blosxom like blog engine for golang.
+
+DESCRIPTION:
+	Blosxom is a simple blog engine that using text file. User write entry and
+	put the file into the data folder which the file extension is '.txt'.
+	This is http server working as blosxom server.  
+
+REQUIRE:
+	web.go : https://github.com/hoisie/web.go/blob/master/web.go
+	mustache.go : https://github.com/hoisie/mustache.go
+
+DIRECTORY STRUCTURE:
+
+	blogo           ... application
+	config.json     ... config file
+	entry.mustache  ... entry file template
+	entres.mustache ... entries file template
+	static/         ... static file directory (customizable)
+	datadir/        ... data file directory (customizable)
+
+NOTE:
+	This contents include files of 'Blueprint CSS Framework'.
+	http://www.blueprintcss.org/
+
+CONFIGURATION:
+	See 'config.json' or code.
+
+AUTHOR:
+	Yasuhiro Matsumoto <mattn.jp@gmail.com>
+
