@@ -6,7 +6,7 @@ DESCRIPTION:
 	This is http server working as blosxom server.  
 
 REQUIRE:
-	web.go : https://github.com/hoisie/web.go/blob/master/web.go
+	web.go      : https://github.com/hoisie/web.go
 	mustache.go : https://github.com/hoisie/mustache.go
 
 DIRECTORY STRUCTURE:
