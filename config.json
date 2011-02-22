@@ -3,7 +3,7 @@
 	"title": "Never Say GoodBye",
 	"description": "I don't wanna live my life like you",
 	"copyright": "Copyright &copy; 2011",
-	"datadir": "datadir",
+	"datadir": "data",
 	"staticdir": "static",
 	"author": "mattn",
 	"useSummary": "mattn",
