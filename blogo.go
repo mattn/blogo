@@ -223,7 +223,7 @@ func main() {
 		}
 		ctx.Abort(500, "Server Error")
 	})
-	web.Config.RecoverPanic = false
+	//web.Config.RecoverPanic = false
 	web.Config.StaticDir = config.Get("staticdir")
 	web.Run(config.Get("host"))
 }
