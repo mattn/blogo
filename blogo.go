@@ -179,6 +179,14 @@ func LoadConfig() (config *Config) {
 	return
 }
 
+func Render(ctx *web.Context, tmpl string, config *Config, name string, data interface{}) {
+	tmpl = pathutil.Join(config.Get("datadir"), tmpl)
+	ctx.WriteString(mustache.RenderFile(tmpl,
+		map[string]interface{}{
+			"config":  config,
+			name: data}))
+}
+
 func main() {
 	config := LoadConfig()
 	web.Get("/(.*)", func(ctx *web.Context, path string) {
@@ -197,25 +205,19 @@ func main() {
 			}
 			entries, err := GetEntries(dir, useSummary)
 			if err == nil {
-				ctx.WriteString(mustache.RenderFile("entries.mustache",
-					map[string]interface{}{
-						"config":  config,
-						"entries": entries}))
+				Render(ctx, "entries.mustache", config, "entries", entries)
 				return
 			}
 		} else if len(path) > 5 && path[len(path)-5:] == ".html" {
 			file := pathutil.Join(datadir, path[:len(path)-5] + ".txt")
 			_, err := os.Stat(file)
 			if err != nil {
-				ctx.NotFound("File Not Found")
+				ctx.NotFound("File Not Found" + err.String())
 				return
 			}
 			entry, err := GetEntry(file)
 			if err == nil {
-				ctx.WriteString(mustache.RenderFile("entry.mustache",
-					map[string]interface{}{
-						"config": config,
-						"entry":  entry}))
+				Render(ctx, "entry.mustache", config, "entry", entry)
 				return
 			}
 		}
