@@ -6,7 +6,7 @@
 	"datadir": "data",
 	"staticdir": "static",
 	"author": "mattn",
-	"useSummary": "mattn",
+	"useSummary": true,
 	"links": [
 		{"name": "Big Sky", "href": "http://mattn.kaoriya.net/"},
 		{"name": "twitter", "href": "http://twitter.com/mattn_jp"}

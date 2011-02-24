@@ -160,6 +160,14 @@ func (c *Config) Set(key string, val interface{}) {
 	(*c)[key] = val
 }
 
+func (c *Config) Is(key string) bool {
+	val, ok := (*c)[key].(bool)
+	if !ok {
+		return false
+	}
+	return val
+}
+
 func (c *Config) Get(key string) string {
 	val, ok := (*c)[key].(string)
 	if !ok {
@@ -199,11 +207,7 @@ func main() {
 				ctx.NotFound("File Not Found")
 				return
 			}
-			var useSummary = false
-			if config.Get("useSummary") != "" {
-				useSummary = true
-			}
-			entries, err := GetEntries(dir, useSummary)
+			entries, err := GetEntries(dir, config.Is("useSummary"))
 			if err == nil {
 				Render(ctx, "entries.mustache", config, "entries", entries)
 				return
