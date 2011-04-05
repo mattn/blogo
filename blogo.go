@@ -6,7 +6,7 @@ import "io"
 import "io/ioutil"
 import "mustache"
 import "os"
-import pathutil "path"
+import "path/filepath"
 import "regexp"
 import "strings"
 import "time"
@@ -87,7 +87,7 @@ func GetEntry(filename string) (entry *Entry, err os.Error) {
 		if n == 0 {
 			entry = new(Entry)
 			entry.Title = line
-			entry.Filename = pathutil.Clean(filename)
+			entry.Filename = filepath.Clean(filename)
 			entry.Tags = []Tag{}
 			entry.Created = time.SecondsToUTC(fi.Ctime_ns / 1e9)
 			continue
@@ -122,7 +122,7 @@ type Entries []*Entry
 
 func (p *Entries) VisitDir(path string, f *os.FileInfo) bool { return true }
 func (p *Entries) VisitFile(path string, f *os.FileInfo) {
-	if strings.ToLower(pathutil.Ext(path)) != ".txt" {
+	if strings.ToLower(filepath.Ext(path)) != ".txt" {
 		return
 	}
 	if entry, err := GetEntry(path); err == nil {
@@ -133,7 +133,7 @@ func (p *Entries) VisitFile(path string, f *os.FileInfo) {
 func GetEntries(path string, useSummary bool) (entries *Entries, err os.Error) {
 	entries = new(Entries)
 	e := make(chan os.Error)
-	pathutil.Walk(path, entries, e)
+	filepath.Walk(path, entries, e)
 	for _, entry := range *entries {
 		if useSummary {
 			doc, err := html.Parse(strings.NewReader(entry.Body))
@@ -177,8 +177,8 @@ func (c *Config) Get(key string) string {
 }
 
 func LoadConfig() (config *Config) {
-	root, _ := pathutil.Split(pathutil.Clean(os.Args[0]))
-	b, err := ioutil.ReadFile(pathutil.Join(root, "config.json"))
+	root, _ := filepath.Split(filepath.Clean(os.Args[0]))
+	b, err := ioutil.ReadFile(filepath.Join(root, "config.json"))
 	if err != nil {
 		println(err.String())
 		return &Config{}
@@ -188,7 +188,7 @@ func LoadConfig() (config *Config) {
 }
 
 func Render(ctx *web.Context, tmpl string, config *Config, name string, data interface{}) {
-	tmpl = pathutil.Join(config.Get("datadir"), tmpl)
+	tmpl = filepath.Join(config.Get("datadir"), tmpl)
 	ctx.WriteString(mustache.RenderFile(tmpl,
 		map[string]interface{}{
 			"config":  config,
@@ -201,7 +201,7 @@ func main() {
 		config = LoadConfig()
 		datadir := config.Get("datadir")
 		if path == "" || path[len(path)-1] == '/' {
-			dir := pathutil.Join(datadir, path)
+			dir := filepath.Join(datadir, path)
 			stat, err := os.Stat(dir)
 			if err != nil || !stat.IsDirectory() {
 				ctx.NotFound("File Not Found")
@@ -213,7 +213,7 @@ func main() {
 				return
 			}
 		} else if len(path) > 5 && path[len(path)-5:] == ".html" {
-			file := pathutil.Join(datadir, path[:len(path)-5] + ".txt")
+			file := filepath.Join(datadir, path[:len(path)-5] + ".txt")
 			_, err := os.Stat(file)
 			if err != nil {
 				ctx.NotFound("File Not Found" + err.String())
