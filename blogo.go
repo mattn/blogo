@@ -1,17 +1,19 @@
 package main
 
-import "bytes"
-import "html"
-import "io"
-import "io/ioutil"
-import "mustache"
-import "os"
-import "path/filepath"
-import "regexp"
-import "strings"
-import "time"
-import "web"
-import "json"
+import (
+	"bytes"
+	"github.com/hoisie/mustache.go"
+	"github.com/hoisie/web.go"
+	"html"
+	"io"
+	"io/ioutil"
+	"json"
+	"os"
+	"path/filepath"
+	"regexp"
+	"strings"
+	"time"
+)
 
 type Tag struct {
 	Name string
@@ -68,7 +70,7 @@ func GetEntry(filename string) (entry *Entry, err os.Error) {
 	if err != nil {
 		return nil, err
 	}
-	f, err := os.Open(filename, os.O_RDONLY, 0)
+	f, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +84,7 @@ func GetEntry(filename string) (entry *Entry, err os.Error) {
 	if err != nil {
 		return nil, err
 	}
-	for n, line := range strings.Split(string(b), "\n", -1) {
+	for n, line := range strings.Split(string(b), "\n") {
 		line = strings.TrimSpace(line)
 		if n == 0 {
 			entry = new(Entry)
@@ -99,7 +101,7 @@ func GetEntry(filename string) (entry *Entry, err os.Error) {
 		if in_body == false && re.MatchString(line) {
 			submatch := re.FindStringSubmatch(line)
 			if submatch[1] == "tags" {
-				tags := strings.Split(submatch[2], ",", -1)
+				tags := strings.Split(submatch[2], ",")
 				entry.Tags = make([]Tag, len(tags))
 				for i, t := range tags {
 					entry.Tags[i].Name = strings.TrimSpace(t)
@@ -191,8 +193,8 @@ func Render(ctx *web.Context, tmpl string, config *Config, name string, data int
 	tmpl = filepath.Join(config.Get("datadir"), tmpl)
 	ctx.WriteString(mustache.RenderFile(tmpl,
 		map[string]interface{}{
-			"config":  config,
-			name: data}))
+			"config": config,
+			name:     data}))
 }
 
 func main() {
@@ -213,7 +215,7 @@ func main() {
 				return
 			}
 		} else if len(path) > 5 && path[len(path)-5:] == ".html" {
-			file := filepath.Join(datadir, path[:len(path)-5] + ".txt")
+			file := filepath.Join(datadir, path[:len(path)-5]+".txt")
 			_, err := os.Stat(file)
 			if err != nil {
 				ctx.NotFound("File Not Found" + err.String())
