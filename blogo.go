@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"github.com/hoisie/mustache.go"
 	"github.com/hoisie/web.go"
 	"html"
@@ -30,19 +31,19 @@ type Entry struct {
 	Tags     []Tag
 }
 
-func toTextChild(w io.Writer, n *html.Node) os.Error {
+func toTextChild(w io.Writer, n *html.Node) error {
 	switch n.Type {
 	case html.ErrorNode:
-		return os.NewError("unexpected ErrorNode")
+		return errors.New("unexpected ErrorNode")
 	case html.DocumentNode:
-		return os.NewError("unexpected DocumentNode")
+		return errors.New("unexpected DocumentNode")
 	case html.ElementNode:
 	case html.TextNode:
 		w.Write([]byte(n.Data))
 	case html.CommentNode:
-		return os.NewError("COMMENT")
+		return errors.New("COMMENT")
 	default:
-		return os.NewError("unknown node type")
+		return errors.New("unknown node type")
 	}
 	for _, c := range n.Child {
 		if err := toTextChild(w, c); err != nil {
@@ -52,7 +53,7 @@ func toTextChild(w io.Writer, n *html.Node) os.Error {
 	return nil
 }
 
-func toText(n *html.Node) (string, os.Error) {
+func toText(n *html.Node) (string, error) {
 	if n == nil || len(n.Child) == 0 {
 		return "", nil
 	}
@@ -65,7 +66,7 @@ func toText(n *html.Node) (string, os.Error) {
 	return b.String(), nil
 }
 
-func GetEntry(filename string) (entry *Entry, err os.Error) {
+func GetEntry(filename string) (entry *Entry, err error) {
 	fi, err := os.Stat(filename)
 	if err != nil {
 		return nil, err
@@ -115,7 +116,7 @@ func GetEntry(filename string) (entry *Entry, err os.Error) {
 		}
 	}
 	if entry == nil {
-		err = os.NewError("invalid entry file")
+		err = errors.New("invalid entry file")
 	}
 	return
 }
@@ -132,9 +133,9 @@ func (p *Entries) VisitFile(path string, f *os.FileInfo) {
 	}
 }
 
-func GetEntries(path string, useSummary bool) (entries *Entries, err os.Error) {
+func GetEntries(path string, useSummary bool) (entries *Entries, err error) {
 	entries = new(Entries)
-	e := make(chan os.Error)
+	e := make(chan error)
 	filepath.Walk(path, entries, e)
 	for _, entry := range *entries {
 		if useSummary {
@@ -182,7 +183,7 @@ func LoadConfig() (config *Config) {
 	root, _ := filepath.Split(filepath.Clean(os.Args[0]))
 	b, err := ioutil.ReadFile(filepath.Join(root, "config.json"))
 	if err != nil {
-		println(err.String())
+		println(err.Error())
 		return &Config{}
 	}
 	err = json.Unmarshal(b, &config)
@@ -218,7 +219,7 @@ func main() {
 			file := filepath.Join(datadir, path[:len(path)-5]+".txt")
 			_, err := os.Stat(file)
 			if err != nil {
-				ctx.NotFound("File Not Found" + err.String())
+				ctx.NotFound("File Not Found" + err.Error())
 				return
 			}
 			entry, err := GetEntry(file)
