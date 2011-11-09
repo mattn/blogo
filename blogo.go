@@ -1,17 +1,20 @@
 package main
 
-import "bytes"
+import (
+	"bytes"
+	"errors"
+)
 import "html"
 import "io"
 import "io/ioutil"
-import "mustache"
+import "github.com/hoisie/mustache.go/mustache"
 import "os"
 import "path/filepath"
 import "regexp"
 import "strings"
 import "time"
 import "web"
-import "json"
+import "encoding/json"
 
 type Tag struct {
 	Name string
@@ -28,19 +31,19 @@ type Entry struct {
 	Tags     []Tag
 }
 
-func toTextChild(w io.Writer, n *html.Node) os.Error {
+func toTextChild(w io.Writer, n *html.Node) error {
 	switch n.Type {
 	case html.ErrorNode:
-		return os.NewError("unexpected ErrorNode")
+		return errors.New("unexpected ErrorNode")
 	case html.DocumentNode:
-		return os.NewError("unexpected DocumentNode")
+		return errors.New("unexpected DocumentNode")
 	case html.ElementNode:
 	case html.TextNode:
 		w.Write([]byte(n.Data))
 	case html.CommentNode:
-		return os.NewError("COMMENT")
+		return errors.New("COMMENT")
 	default:
-		return os.NewError("unknown node type")
+		return errors.New("unknown node type")
 	}
 	for _, c := range n.Child {
 		if err := toTextChild(w, c); err != nil {
@@ -50,7 +53,7 @@ func toTextChild(w io.Writer, n *html.Node) os.Error {
 	return nil
 }
 
-func toText(n *html.Node) (string, os.Error) {
+func toText(n *html.Node) (string, error) {
 	if n == nil || len(n.Child) == 0 {
 		return "", nil
 	}
@@ -63,12 +66,12 @@ func toText(n *html.Node) (string, os.Error) {
 	return b.String(), nil
 }
 
-func GetEntry(filename string) (entry *Entry, err os.Error) {
+func GetEntry(filename string) (entry *Entry, err error) {
 	fi, err := os.Stat(filename)
 	if err != nil {
 		return nil, err
 	}
-	f, err := os.Open(filename, os.O_RDONLY, 0)
+	f, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +85,7 @@ func GetEntry(filename string) (entry *Entry, err os.Error) {
 	if err != nil {
 		return nil, err
 	}
-	for n, line := range strings.Split(string(b), "\n", -1) {
+	for n, line := range strings.Split(string(b), "\n") {
 		line = strings.TrimSpace(line)
 		if n == 0 {
 			entry = new(Entry)
@@ -99,7 +102,7 @@ func GetEntry(filename string) (entry *Entry, err os.Error) {
 		if in_body == false && re.MatchString(line) {
 			submatch := re.FindStringSubmatch(line)
 			if submatch[1] == "tags" {
-				tags := strings.Split(submatch[2], ",", -1)
+				tags := strings.Split(submatch[2], ",")
 				entry.Tags = make([]Tag, len(tags))
 				for i, t := range tags {
 					entry.Tags[i].Name = strings.TrimSpace(t)
@@ -113,7 +116,7 @@ func GetEntry(filename string) (entry *Entry, err os.Error) {
 		}
 	}
 	if entry == nil {
-		err = os.NewError("invalid entry file")
+		err = errors.New("invalid entry file")
 	}
 	return
 }
@@ -130,9 +133,9 @@ func (p *Entries) VisitFile(path string, f *os.FileInfo) {
 	}
 }
 
-func GetEntries(path string, useSummary bool) (entries *Entries, err os.Error) {
+func GetEntries(path string, useSummary bool) (entries *Entries, err error) {
 	entries = new(Entries)
-	e := make(chan os.Error)
+	e := make(chan error)
 	filepath.Walk(path, entries, e)
 	for _, entry := range *entries {
 		if useSummary {
@@ -180,7 +183,7 @@ func LoadConfig() (config *Config) {
 	root, _ := filepath.Split(filepath.Clean(os.Args[0]))
 	b, err := ioutil.ReadFile(filepath.Join(root, "config.json"))
 	if err != nil {
-		println(err.String())
+		println(err.Error())
 		return &Config{}
 	}
 	err = json.Unmarshal(b, &config)
@@ -191,8 +194,8 @@ func Render(ctx *web.Context, tmpl string, config *Config, name string, data int
 	tmpl = filepath.Join(config.Get("datadir"), tmpl)
 	ctx.WriteString(mustache.RenderFile(tmpl,
 		map[string]interface{}{
-			"config":  config,
-			name: data}))
+			"config": config,
+			name:     data}))
 }
 
 func main() {
@@ -213,10 +216,10 @@ func main() {
 				return
 			}
 		} else if len(path) > 5 && path[len(path)-5:] == ".html" {
-			file := filepath.Join(datadir, path[:len(path)-5] + ".txt")
+			file := filepath.Join(datadir, path[:len(path)-5]+".txt")
 			_, err := os.Stat(file)
 			if err != nil {
-				ctx.NotFound("File Not Found" + err.String())
+				ctx.NotFound("File Not Found" + err.Error())
 				return
 			}
 			entry, err := GetEntry(file)
