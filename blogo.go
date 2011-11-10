@@ -2,13 +2,13 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"github.com/hoisie/mustache.go"
 	"github.com/hoisie/web.go"
 	"html"
 	"io"
 	"io/ioutil"
-	"json"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -121,23 +121,16 @@ func GetEntry(filename string) (entry *Entry, err error) {
 	return
 }
 
-type Entries []*Entry
-
-func (p *Entries) VisitDir(path string, f *os.FileInfo) bool { return true }
-func (p *Entries) VisitFile(path string, f *os.FileInfo) {
-	if strings.ToLower(filepath.Ext(path)) != ".txt" {
-		return
-	}
-	if entry, err := GetEntry(path); err == nil {
-		*p = append(*p, entry)
-	}
-}
-
-func GetEntries(path string, useSummary bool) (entries *Entries, err error) {
-	entries = new(Entries)
-	e := make(chan error)
-	filepath.Walk(path, entries, e)
-	for _, entry := range *entries {
+func GetEntries(root string, useSummary bool) (entries []*Entry, err error) {
+	filepath.Walk(root, func(path string, info *os.FileInfo, err error) error {
+		if strings.ToLower(filepath.Ext(path)) != ".txt" {
+			return nil
+		}
+		entry, _ := GetEntry(path)
+		if entry == nil {
+			return nil
+		}
+		entries = append(entries, entry)
 		if useSummary {
 			doc, err := html.Parse(strings.NewReader(entry.Body))
 			if err == nil {
@@ -149,11 +142,9 @@ func GetEntries(path string, useSummary bool) (entries *Entries, err error) {
 				}
 			}
 		}
-		entry.Id = entry.Filename[len(path):len(entry.Filename)-3] + "html"
-	}
-	if len(*entries) == 0 {
-		entries = nil
-	}
+		entry.Id = entry.Filename[len(root):len(entry.Filename)-3] + "html"
+		return nil
+	})
 	return
 }
 
