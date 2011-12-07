@@ -25,7 +25,7 @@ type Entry struct {
 	Filename string
 	Title    string
 	Body     string
-	Created  *time.Time
+	Created  time.Time
 	Category string
 	Author   string
 	Tags     []Tag
@@ -92,7 +92,7 @@ func GetEntry(filename string) (entry *Entry, err error) {
 			entry.Title = line
 			entry.Filename = filepath.Clean(filename)
 			entry.Tags = []Tag{}
-			entry.Created = time.SecondsToUTC(fi.Ctime_ns / 1e9)
+			entry.Created = time.Unix(fi.Ctime_ns/1e9, 0).UTC()
 			continue
 		}
 		if n > 0 && len(line) == 0 {
@@ -122,7 +122,7 @@ func GetEntry(filename string) (entry *Entry, err error) {
 }
 
 func GetEntries(root string, useSummary bool) (entries []*Entry, err error) {
-	filepath.Walk(root, func(path string, info *os.FileInfo, err error) error {
+	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if strings.ToLower(filepath.Ext(path)) != ".txt" {
 			return nil
 		}
@@ -197,7 +197,7 @@ func main() {
 		if path == "" || path[len(path)-1] == '/' {
 			dir := filepath.Join(datadir, path)
 			stat, err := os.Stat(dir)
-			if err != nil || !stat.IsDirectory() {
+			if err != nil || !stat.IsDir() {
 				ctx.NotFound("File Not Found")
 				return
 			}
