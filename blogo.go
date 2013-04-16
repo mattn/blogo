@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/hoisie/mustache.go"
-	"github.com/hoisie/web.go"
-	"html"
+	"github.com/hoisie/mustache"
+	"github.com/hoisie/web"
+	"code.google.com/p/go.net/html"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -45,7 +46,7 @@ func toTextChild(w io.Writer, n *html.Node) error {
 	default:
 		return errors.New("unknown node type")
 	}
-	for _, c := range n.Child {
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		if err := toTextChild(w, c); err != nil {
 			return err
 		}
@@ -54,12 +55,12 @@ func toTextChild(w io.Writer, n *html.Node) error {
 }
 
 func toText(n *html.Node) (string, error) {
-	if n == nil || len(n.Child) == 0 {
+	if n == nil || n.FirstChild == nil {
 		return "", nil
 	}
 	b := bytes.NewBuffer(nil)
-	for _, child := range n.Child {
-		if err := toTextChild(b, child); err != nil {
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		if err := toTextChild(b, c); err != nil {
 			return "", err
 		}
 	}
@@ -92,7 +93,7 @@ func GetEntry(filename string) (entry *Entry, err error) {
 			entry.Title = line
 			entry.Filename = filepath.Clean(filename)
 			entry.Tags = []Tag{}
-			entry.Created = time.Unix(fi.Ctime_ns/1e9, 0).UTC()
+			entry.Created = fi.ModTime()
 			continue
 		}
 		if n > 0 && len(line) == 0 {
@@ -170,14 +171,13 @@ func (c *Config) Get(key string) string {
 	return val
 }
 
-func LoadConfig() (config *Config) {
+func LoadConfig() (config Config) {
 	root, _ := filepath.Split(filepath.Clean(os.Args[0]))
 	b, err := ioutil.ReadFile(filepath.Join(root, "config.json"))
 	if err != nil {
-		println(err.Error())
-		return &Config{}
+		log.Fatal(err)
 	}
-	err = json.Unmarshal(b, &config)
+	json.Unmarshal(b, &config)
 	return
 }
 
@@ -203,7 +203,7 @@ func main() {
 			}
 			entries, err := GetEntries(dir, config.Is("useSummary"))
 			if err == nil {
-				Render(ctx, "entries.mustache", config, "entries", entries)
+				Render(ctx, "entries.mustache", &config, "entries", entries)
 				return
 			}
 		} else if len(path) > 5 && path[len(path)-5:] == ".html" {
@@ -215,7 +215,8 @@ func main() {
 			}
 			entry, err := GetEntry(file)
 			if err == nil {
-				Render(ctx, "entry.mustache", config, "entry", entry)
+				entry.Id = entry.Filename[len(datadir):len(entry.Filename)-3] + "html"
+				Render(ctx, "entry.mustache", &config, "entry", entry)
 				return
 			}
 		}

@@ -3,12 +3,12 @@
 	<head> 
 		<meta charset="utf-8" /> 
 		<title>{{#config}}{{title}}{{/config}}</title> 
-		<link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection" /> 
-		<link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print" /> 
-		<!--[if IE]><link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection" /><![endif]--> 
+		<link rel="stylesheet" href="{{#config}}{{root}}{{/config}}/css/blueprint/screen.css" type="text/css" media="screen, projection" /> 
+		<link rel="stylesheet" href="{{#config}}{{root}}{{/config}}/css/blueprint/print.css" type="text/css" media="print" /> 
+		<!--[if IE]><link rel="stylesheet" href="{{#config}}{{root}}{{/config}}/css/blueprint/ie.css" type="text/css" media="screen, projection" /><![endif]--> 
 		<!-- Import fancy-type plugin. --> 
-		<link rel="stylesheet" href="/css/blueprint/plugins/fancy-type/screen.css" type="text/css" media="screen, projection" /> 
-		<script type="text/javascript" src="/js/html5.js"></script>
+		<link rel="stylesheet" href="{{#config}}{{root}}{{/config}}/css/blueprint/plugins/fancy-type/screen.css" type="text/css" media="screen, projection" /> 
+		<script type="text/javascript" src="{{#config}}{{root}}{{/config}}/js/html5.js"></script>
 	</head> 
 	<body> 
 		<div class="container"> 
@@ -24,7 +24,7 @@
 			<div class="span-17 colborder" id="content"> 
 {{#entries}}
 				<div class="span-17 colborder">
-					<h3 class="loud"><a href="{{Id}}">{{Title}}</a></h3> 
+					<h3 class="loud"><a href="{{#config}}{{root}}{{/config}}{{Id}}">{{Title}}</a></h3> 
 					<div class="span-17 last"> 
 						<span class="prepend-12">{{#Tags}} {{Name}}{{/Tags}}</span> 
 						<div> 
@@ -61,7 +61,7 @@
 					<ul> 
 {{#config}}
 {{#links}}
-<li><a class="quiet" href="{{href}}">{{name}}</a></li>
+<li><a class="quiet" href="{{#config}}{{root}}{{/config}}{{href}}">{{name}}</a></li>
 {{/links}}
 {{/config}}
 					</ul> 
