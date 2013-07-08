@@ -219,6 +219,13 @@ func main() {
 				Render(ctx, "entry.mustache", &config, "entry", entry)
 				return
 			}
+		} else if path == "index.rss" {
+			entries, err := GetEntries(datadir, config.Is("useSummary"))
+			if err == nil {
+				ctx.SetHeader("Content-Type", "application/rss+xml; charset=utf-8", true)
+				Render(ctx, "entries.rss", &config, "entries", entries)
+				return
+			}
 		}
 		ctx.Abort(500, "Server Error")
 	})
